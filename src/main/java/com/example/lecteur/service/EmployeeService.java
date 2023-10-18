@@ -26,11 +26,26 @@ public class EmployeeService {
         return employeeRepository.findById(id).orElseThrow(() -> new RuntimeException("Couldn't find employee with id " + id));
     }
 
-    public void deleteEmployee(Integer id) {
-        Employee employees = findById(id);
-        if (employees != null) {
-            employeeRepository.delete(employees);
-        }
+    public void deleteEmployee(Employee employee) {
 
+        employeeRepository.delete(employee);
+
+    }
+
+    public List<Employee> getEmployeeByCode() {
+        return employeeRepository.findEmployeeByHasCodeIsNull();
+    }
+
+    public void updateEmployeeByCode(Employee employee) {
+
+        employeeRepository.save(employee);
+    }
+
+    public Employee findEmployeeByPhotoProfileContains(String photoProfile) {
+        return employeeRepository.findEmployeeByPhotoProfileContains(photoProfile);
+    }
+
+    public Employee findEmployeeByMatriculeContains(String matricule) {
+        return employeeRepository.findEmployeeByMatriculeContains(matricule);
     }
 }

@@ -14,16 +14,18 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
 //    Ticket findTicketByDateTicketAndEmployee(Date date);
 
-    Ticket findTicketByDateTicket(Date timestamp);
-
-    @Query("SELECT YEAR(t.dateTicket) as year, MONTH(t.dateTicket) as month, COUNT(t) as ticketCount FROM Ticket t " +
-            "WHERE t.IdEmployee = :employeeId " +
-            "GROUP BY YEAR(t.dateTicket), MONTH(t.dateTicket)")
-    List<Object[]> countTicketsByMonthAndYear(@Param("employeeId") Integer employeeId);
+    Ticket findTicketByDateTicketAndEmployee_Id(Date timestamp, Integer id);
 
     @Query("SELECT YEAR(t.dateTicket) as year, MONTH(t.dateTicket) as month, COUNT(t) as ticketCount " +
             "FROM Ticket t " +
-            "WHERE (:employeeId IS NULL OR t.IdEmployee = :employeeId) " +
+            "WHERE (:employeeId IS NULL OR t.employee.id = :employeeId) " +
+            "GROUP BY YEAR(t.dateTicket), MONTH(t.dateTicket)")
+    List<Object[]> countTicketsByMonthAndYear(@Param("employeeId") Integer employeeId);
+
+
+    @Query("SELECT YEAR(t.dateTicket) as year, MONTH(t.dateTicket) as month, COUNT(t) as ticketCount " +
+            "FROM Ticket t " +
+            "WHERE (:employeeId IS NULL OR t.employee.id = :employeeId) " +
             "  AND (:year IS NULL OR YEAR(t.dateTicket) = :year) " +
             "  AND (:month IS NULL OR MONTH(t.dateTicket) = :month) " +
             "GROUP BY YEAR(t.dateTicket), MONTH(t.dateTicket)")
@@ -31,5 +33,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
             @Param("employeeId") Integer employeeId,
             @Param("year") Integer year,
             @Param("month") Integer month);
+
 
 }

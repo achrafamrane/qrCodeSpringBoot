@@ -5,6 +5,7 @@ import com.example.lecteur.model.Employee;
 import com.example.lecteur.model.Ticket;
 import com.example.lecteur.response.TicketCountDTO;
 import com.example.lecteur.service.EmployeeService;
+import com.example.lecteur.service.EmployeeTicketCountService;
 import com.example.lecteur.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequiredArgsConstructor
 @RequestMapping("/checkTicket")
 public class CheckController {
@@ -25,23 +27,27 @@ public class CheckController {
 
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private EmployeeTicketCountService employeeTicketCountService;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> checkTicket(@PathVariable Integer id) {
-        try {
-            Employee employee = employeeService.findById(id);
-            Ticket ticket = ticketService.getTicketByDateTicket(TicketService.removeTime(new Date()));
 
-            if (ticket == null || (ticket.getIdEmployee() != null && !ticket.getIdEmployee().equals(id))) {
-                addNewTicket(employee);
-                return ResponseEntity.ok("Ticket checked successfully");
-            } else {
-                return ResponseEntity.ok("Ticket already checked");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error checking ticket");
+        //
+        Ticket ticket = ticketService.getTicketByDateTicket(TicketService.removeTime(new Date()), id);
+        Employee employee = employeeService.findById(id);
+        if (ticket == null || (ticket.getEmployee().getId() != null && !ticket.getEmployee().getId().equals(id))) {
+            addNewTicket(employee);
+
+            return ResponseEntity.ok(true);
+        } else {
+
+            return ResponseEntity.ok(false);
         }
+
     }
+
 
     // Other endpoints...
 
@@ -89,9 +95,11 @@ public class CheckController {
 
     private void addNewTicket(Employee employee) {
         Ticket ticket = new Ticket();
-        ticket.setDateTicket(new Date());
-        ticket.setIdEmployee(employee.getId());
+        ticket.setDateTicket(TicketService.removeTime(new Date()));
+        ticket.setEmployee(employee);
         ticketService.addTicket(ticket);
+        employeeTicketCountService.addTicketAndUpdateCounts(ticket);
+
     }
 }
 

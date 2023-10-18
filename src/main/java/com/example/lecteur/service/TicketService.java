@@ -26,9 +26,9 @@ public class TicketService {
         return cal.getTime();
     }
 
-    public Ticket getTicketByDateTicket(Date timestamp) {
+    public Ticket getTicketByDateTicket(Date timestamp, Integer id) {
 
-        return ticketRepository.findTicketByDateTicket(timestamp);
+        return ticketRepository.findTicketByDateTicketAndEmployee_Id(timestamp, id);
 
     }
 
