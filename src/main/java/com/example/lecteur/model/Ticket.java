@@ -18,6 +18,7 @@ public class Ticket {
     @Id
     @GeneratedValue
     private Integer id;
+    
     @Column(name = "date_ticket")
     @Temporal(TemporalType.DATE)
     private Date dateTicket;

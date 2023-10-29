@@ -4,13 +4,9 @@ import com.example.lecteur.model.Employee;
 import com.example.lecteur.repository.EmployeeRepository;
 import com.example.lecteur.response.Message;
 import com.example.lecteur.service.EmployeeService;
-import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
+import net.sf.jasperreports.engine.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.lecteur.utils.Util.*;
 
@@ -107,7 +103,7 @@ public class EmployeeController {
 
         String fileName = employee.getPhotoProfile();
         String filePath = PATH_TO_PHOTO_PROFILE + fileName;
-        String QRCODEPath = QR_CODE_PATH + employee.getId() + SUFIX_QR_CODE;
+        String QRCODEPath = BADGE_CODE_PATH + employee.getId() + SUFIX_BADGE;
         System.out.println(QRCODEPath);
         File file = new File(filePath);
         File fileQR = new File(QRCODEPath);
@@ -124,18 +120,48 @@ public class EmployeeController {
 
 
     public boolean generateQRCode(Employee employee) throws WriterException, IOException {
-        String qrCodePath = QR_CODE_PATH;
-        String qrCodeName = qrCodePath + employee.getId() + SUFIX_QR_CODE;
-        var qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(employee.getId() + "\n", BarcodeFormat.QR_CODE,
-                QR_CODE_WIDTH, QR_CODE_HEIGHT);
-        Path path = FileSystems.getDefault().getPath(qrCodeName);
+//        String qrCodePath = QR_CODE_PATH;
+//        String qrCodeName = qrCodePath + employee.getId() + SUFIX_QR_CODE;
+//        var qrCodeWriter = new QRCodeWriter();
+//        BitMatrix bitMatrix = qrCodeWriter.encode(employee.getId() + "\n", BarcodeFormat.QR_CODE,
+//                QR_CODE_WIDTH, QR_CODE_HEIGHT);
+//        Path path = FileSystems.getDefault().getPath(qrCodeName);
+//
+//        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+//        employee.setHasCode(true);
+//        employeeRepository.save(employee);
+        try {
+            // Compile JRXML to JasperReport
+            String jrxmlPath = BADGE_CODE_PATH + "badge.jrxml";
 
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
-        employee.setHasCode(true);
-        employeeRepository.save(employee);
-        return true;
+            // Load the compiled JasperReport
+            JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlPath);
 
+            // Set parameters for the report
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("Nom", employee.getFirstName()); // Replace "param1" with your parameter name
+            parameters.put("Prenom", employee.getLastName()); // Replace "param1" with your parameter name
+            parameters.put("id", String.valueOf(employee.getId())); // Replace "param1" with your parameter name
+            parameters.put("Matricule", String.valueOf(employee.getMatricule())); // Replace "param1" with your parameter name
+
+
+            // Compile and fill the report
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            // Export the report to a PDF file (you can change the format as needed)
+            String outputFile = BADGE_CODE_PATH + employee.getId() + SUFIX_BADGE;
+            JasperExportManager.exportReportToPdfFile(jasperPrint, outputFile);
+
+            System.out.println("Report generated successfully at: " + outputFile);
+            employee.setHasCode(true);
+            employeeRepository.save(employee);
+        } catch (JRException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-
 }
+
+
+
+

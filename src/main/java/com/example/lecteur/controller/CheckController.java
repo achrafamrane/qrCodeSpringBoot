@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RequestMapping("/checkTicket")
 public class CheckController {
@@ -33,19 +33,14 @@ public class CheckController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> checkTicket(@PathVariable Integer id) {
-
-        //
         Ticket ticket = ticketService.getTicketByDateTicket(TicketService.removeTime(new Date()), id);
         Employee employee = employeeService.findById(id);
-        if (ticket == null || (ticket.getEmployee().getId() != null && !ticket.getEmployee().getId().equals(id))) {
+        if ((ticket == null || !ticket.getEmployee().getId().equals(id))) {
             addNewTicket(employee);
-
             return ResponseEntity.ok(true);
         } else {
-
             return ResponseEntity.ok(false);
         }
-
     }
 
 
