@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
-//    Ticket findTicketByDateTicketAndEmployee(Date date);
+    //    Ticket findTicketByDateTicketAndEmployee(Date date);
 
     Ticket findTicketByDateTicketAndEmployee_Id(Date timestamp, Integer id);
 

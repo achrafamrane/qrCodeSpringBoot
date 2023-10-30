@@ -61,7 +61,7 @@ public class EmployeeController {
             employee.setMatricule(matricule);
             employeeService.addEmployee(employee);
         } else {
-            String fileName = matricule + "_" + image.getOriginalFilename();
+            String fileName = matricule.substring(0, 3) + "_" + image.getOriginalFilename();
             String filePath = PATH_TO_PHOTO_PROFILE + fileName;
             File dest = new File(filePath);
             image.transferTo(dest);

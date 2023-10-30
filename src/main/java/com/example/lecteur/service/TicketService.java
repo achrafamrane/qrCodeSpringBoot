@@ -49,4 +49,6 @@ public class TicketService {
                 .map(result -> new TicketCountDTO((Integer) result[0], (Integer) result[1], (Long) result[2]))
                 .collect(Collectors.toList());
     }
+
+
 }

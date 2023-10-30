@@ -29,10 +29,8 @@ public class EmployeeTicketCountService {
     }
 
     public void addTicketAndUpdateCounts(Ticket newTicket) {
-        System.out.println("newTicket:" + newTicket);
 
         int Month = Month(newTicket.getDateTicket());
-        System.out.println("Month:" + Month);
         int Year = Year(newTicket.getDateTicket());
         Employee employee = newTicket.getEmployee();
         EmployeeTicketCount existingEntry = employeeTicketCountRepository.findByEmployeeAndYearAndMonth(employee, Year, Month);
